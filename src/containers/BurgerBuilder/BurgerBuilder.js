@@ -18,7 +18,8 @@ class BurgerBuilder extends Component {
             meat: 0,
             bacon: 0
         },
-        basePrice: 4
+        basePrice: 4,
+        purchasable: false
 
     }
 
@@ -31,6 +32,7 @@ class BurgerBuilder extends Component {
         const priceAddition = INGREDIENT_PRICES[type]
         const totalPrice = this.state.basePrice + priceAddition
         this.setState({basePrice: totalPrice, ingredients: updatedIngredients})
+        this.updatePurchaseState(updatedIngredients)
 
     }
 
@@ -44,14 +46,23 @@ class BurgerBuilder extends Component {
             const priceDeduction = INGREDIENT_PRICES[type]
             const totalPrice = this.state.basePrice - priceDeduction
             this.setState({basePrice: totalPrice, ingredients: updatedIngredients})
+            this.updatePurchaseState(updatedIngredients)
         }
+    }
+
+    updatePurchaseState = (ingredients) => {
+        const numberOfIngredients = Object.keys(ingredients).map(iKey => {
+            return ingredients[iKey]
+        }).reduce((sum, el) => sum + el, 0)
+
+        this.setState({purchasable: numberOfIngredients > 0})
     }
 
     render() {
         const disabledInfo = {
             ...this.state.ingredients
         }
-        for(let key in disabledInfo){
+        for (let key in disabledInfo) {
             disabledInfo[key] = disabledInfo[key] <= 0
         }
         return (
@@ -62,6 +73,7 @@ class BurgerBuilder extends Component {
                                    ingredientRemoved={this.removeIngredientHandler}
                                    disabled={disabledInfo}
                                    totalPrice={this.state.basePrice}
+                                   purchasable={this.state.purchasable}
                     />
                 </div>
             </Aux>
